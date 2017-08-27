@@ -1,0 +1,18 @@
+<dict>
+	<key>Font</key>
+	<data>#FontData#</data>
+	<key>Name</key>
+	<string>#FontFileName#</string>
+	<key>PayloadDescription</key>
+	<string>Configures Font settings</string>
+	<key>PayloadDisplayName</key>
+	<string>Fonts</string>
+	<key>PayloadIdentifier</key>
+	<string>com.apple.font.#FontPayloadIdentifier#</string>
+	<key>PayloadType</key>
+	<string>com.apple.font</string>
+	<key>PayloadUUID</key>
+	<string>#FontPayloadUUID#</string>
+	<key>PayloadVersion</key>
+	<integer>1</integer>
+</dict>

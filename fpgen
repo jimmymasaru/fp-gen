@@ -1,0 +1,115 @@
+#!/usr/bin/env node
+
+'use strict';
+const fs = require('fs');
+const path = require('path');
+const readline = require('readline');
+const uuidv4 = require('uuid/v4');
+// const through2 = require('through2');
+
+const tmplProfile = 'tmpl/profile.xml';
+const tmplFont = 'tmpl/font.xml';
+
+const yargs = require('yargs')
+	.epilog('iOS Font Profile Generator\nCopyright (c) 2017 Jimmy Page.')
+	.alias('?', 'help')
+	.alias('usage', 'help').usage('\nUsage:\n\
+		|$0 <font> [<font2> <font3> ...] [-o <output>] [-n <name>] [-d <description>] [--org <organisation>]'.replace(/^\s*\|/gm, ''))
+	.example('', 'fpgen ~/Documents/MyriadPro -o MyriadPro.mobileconfig -n "Myriad Pro" -d "Myriad Pro Family"')
+	.option('output', {
+		describe: 'Output filename. If blank, it would be the name of the first input file + ".mobileconfig"',
+		alias: 'o',
+		default: '',
+		required: false
+	})
+	.option('name', {
+		describe: 'Font Name',
+		alias: 'n',
+		default: 'Font',
+		required: false
+	})
+	.option('desc', {
+		describe: 'Description',
+		alias: 'd',
+		default: '',
+		required: false
+	})
+	.option('org', {
+		describe: 'Organisation',
+		default: '',
+		required: false
+	})
+	.demandCommand(1, '');
+
+let argv = yargs.argv;
+if (argv.help) {
+	yargs.showHelp();
+	process.exit(0);
+}
+
+let inputs = new Set();
+let output = argv.output;
+for (let input of argv._) {
+	let p = path.resolve(input);
+	if (fs.existsSync(p)) {
+		if (fs.lstatSync(p).isDirectory()) {
+			getFiles(p).forEach(x => inputs.add(x));
+		} else {
+			inputs.add(p);
+		}
+	} else {
+		process.stderr.write(`Path not found: ${p}\n`);
+	}
+}
+if (inputs.size == 0) {
+	process.stderr.write('No fonts found.\n');
+	process.exit(1);
+}
+if (output == '' || typeof output != 'string') {
+	for (let [index, value] of inputs.entries()) {
+		output = path.parse(value).name + '.mobileconfig';
+		break;
+	}
+}
+output = path.resolve(output);
+
+let profileContent = fs.readFileSync(path.resolve(__dirname, tmplProfile), 'utf8');
+profileContent = profileContent
+	.replace('#PayloadDescription#', argv.desc)
+	.replace('#PayloadDisplayName#', argv.name)
+	.replace('#PayloadIdentifier#', uuidv4().toUpperCase())
+	.replace('#PayloadOrganization#', argv.org || '')
+	.replace('#PayloadUUID#', uuidv4().toUpperCase());
+let payloadContent = '';
+for (let [index, value] of inputs.entries()) {
+	process.stdout.write(`-  ${value}\n`);
+	let payloadIdentifier = uuidv4().toUpperCase();
+	let fontContent = fs.readFileSync(path.resolve(__dirname, tmplFont), 'utf8');
+	fontContent = fontContent
+		.replace('#FontFileName#', path.parse(value).name + path.parse(value).ext)
+		.replace('#FontPayloadIdentifier#', payloadIdentifier)
+		.replace('#FontPayloadUUID#', payloadIdentifier)
+	let base64font = fs.readFileSync(value).toString('base64');
+	fontContent = fontContent.replace('#FontData#', base64font);
+	payloadContent += fontContent + '\n';
+}
+
+profileContent = profileContent.replace('#PayloadContent#', payloadContent);
+process.stdout.write(`=> ${output}\n`);
+fs.writeFileSync(output, profileContent);
+process.exit(0);
+
+function getFiles(dir) {
+	let files = [];
+	fs.readdirSync(dir).forEach(p => {
+		let fullPath = path.resolve(dir, p);
+		if (fs.existsSync(fullPath)) {
+			if (fs.lstatSync(fullPath).isDirectory())
+				files.push(...getFiles(p));
+			else
+				files.push(fullPath);
+		}
+	}
+	);
+	return files;
+}

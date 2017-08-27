@@ -1,0 +1,27 @@
+{
+  "name": "fp-gen",
+  "version": "1.0.0",
+  "description": "iOS Font Profile Generator",
+  "main": "fpgen.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jimmymasaru/fp-gen.git"
+  },
+  "keywords": [
+    "ios",
+    "font-profile"
+  ],
+  "author": "Jimmy Tsang",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jimmymasaru/fp-gen/issues"
+  },
+  "homepage": "https://github.com/jimmymasaru/fp-gen/readme.md",
+  "dependencies": {
+    "uuid": "^3.1.0",
+    "yargs": "^8.0.2"
+  }
+}
