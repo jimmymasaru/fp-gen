@@ -100,14 +100,17 @@ fs.writeFileSync(output, profileContent);
 process.exit(0);
 
 function getFiles(dir) {
+	let validExts = ['.otf', '.ttf'];
 	let files = [];
 	fs.readdirSync(dir).forEach(p => {
 		let fullPath = path.resolve(dir, p);
 		if (fs.existsSync(fullPath)) {
 			if (fs.lstatSync(fullPath).isDirectory())
 				files.push(...getFiles(p));
-			else
-				files.push(fullPath);
+			else {
+				if (validExts.some(ext => fullPath.toLowerCase().endsWith(ext)))
+					files.push(fullPath);
+			}
 		}
 	}
 	);
