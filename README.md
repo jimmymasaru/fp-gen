@@ -16,6 +16,9 @@ fpgen <font> [<font2> <font3> ...] -o <output.mobileconfig> -n <font name> -d <f
 fpgen ~/Documents/MyriadPro -o MyriadPro.mobileconfig -n "Myriad Pro" -d "Myriad Pro Family" -org "Jimmy Page"
 ```
 ### Output
+The converted font profiles can be either mailed or sent via AirDrop to your iOS devices. The screenshots below show how a font profile looks on an iOS device. Apple Configurator 2 can deploy a font profile as well and you do not have to tap any buttons on your devices. Please note that opening a font profile (.mobileconfig) through any kinds of iOS file managers would not work.
+
+
 <img src="img/screenshot1.png" width="250">
 <img src="img/screenshot2.png" width="250">
 
